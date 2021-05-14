@@ -28,6 +28,16 @@
                   label="Department"
                   outlined
                 ></v-select>
+                <v-select
+                  v-model="appointment.doctor"
+                  :disabled="(!!appointment.department) ? false: true"
+                  clearable
+                  :rules="[v => !!v || 'Doctor is required']"
+                  prepend-inner-icon="mdi-doctor"
+                  :items="doctors"
+                  label="Doctor"
+                  outlined
+                ></v-select>
                 <v-dialog
                   ref="dialog"
                   v-model="modal"
@@ -39,7 +49,7 @@
                     <v-text-field
                       outlined
                       v-model="appointment.date"
-                      :disabled="!!appointment.department ? false: true"
+                      :disabled="(!!appointment.department && !!appointment.doctor) ? false: true"
                       :rules="[v => !!v || 'Appointment Date is required']"
                       label="Appointment Date"
                       prepend-inner-icon="mdi-calendar"
@@ -71,16 +81,6 @@
                     </v-btn>
                   </v-date-picker>
                 </v-dialog>
-                <v-select
-                  v-model="appointment.doctor"
-                  :disabled="(!!appointment.department && !!appointment.date) ? false: true"
-                  clearable
-                  :rules="[v => !!v || 'Doctor is required']"
-                  prepend-inner-icon="mdi-doctor"
-                  :items="doctors"
-                  label="Doctor"
-                  outlined
-                ></v-select>
                 </v-form>
               </v-card-text>
               <v-card-actions>
@@ -108,11 +108,11 @@
       <PaginationTable :items="items" :headers="headers" :tableInfo="tableInfo" :buttonHeader="buttonHeader" style="margin-top:1.5rem" class="mx-2">
           <template #buttons="{item}">
             <v-row>
-            <v-col class="d-flex justify-center mx-n5">
-                <v-btn @click="editApt(item)" width="70%" class="rounded-lg font-weight-bold rounded-pill" outlined color="#5080DE">Edit</v-btn>
+            <v-col class="d-flex justify-center mx-n6">
+                <v-btn icon @click="editApt(item)" color="datatablefontcolor"><v-icon>mdi-pencil-outline</v-icon></v-btn>
             </v-col>
             <v-col class="d-flex justify-center ml-n8">
-                <v-btn @click="deleteApt(item)" class="rounded-lg font-weight-bold rounded-pill" outlined color="#5080DE">Cancel</v-btn>
+                <v-btn icon @click="deleteApt(item)" color="datatablefontcolor"><v-icon>mdi-delete</v-icon></v-btn>
             </v-col>
             </v-row>
           </template>
@@ -120,7 +120,7 @@
     </v-container>
   </v-app>
 </template>
-
+// TODO - Datepicker should not disable dates but rather doctor choice should vary based on the date
 <script>
 import PaginationTable from "@/components/PaginationTable";
 export default {
@@ -219,7 +219,9 @@ export default {
       console.log('valid')
       this.edit = false;
       this.dialog=true;
-      this.$refs.form.resetValidation()
+      if(this.$refs.form) {
+          this.$refs.form.resetValidation()   
+      }
     }
   },
   created: function(){

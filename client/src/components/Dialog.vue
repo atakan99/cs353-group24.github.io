@@ -16,7 +16,7 @@
                 </v-row>
             </v-card-text>
             <v-card-title class="headline datatablefontcolor--text font-weight-bold mt-n8">
-                {{title}}
+                {{!!title ? title : ''}}
             </v-card-title>
             <v-card-subtitle v-if="!!subtitle" class="blue--text text--lighten-3 pt-1">
                 {{subtitle}}
@@ -43,7 +43,7 @@
             </v-card-text>
 
             <v-card-title class="headline datatablefontcolor--text font-weight-bold mt-n8">
-                {{title}}
+                {{!!title ? title : ''}}
             </v-card-title>
 
             <v-card-subtitle v-if="!!subtitle" class="blue--text text--lighten-3 pt-1">
@@ -65,8 +65,8 @@
                 <!-- <v-spacer></v-spacer> -->
                 <v-col>
                     <PaginationTable :items="tableData.items" :headers="tableData.headers" :tableInfo="tableData.tableInfo" :buttonHeader="tableData.buttonHeader">
-                        <template #buttons>
-                            <slot name="tableActions"></slot>
+                        <template #buttons={item}>
+                            <slot name="tableActions" :item="item"></slot>
                         </template>
                     </PaginationTable>
                 </v-col>
@@ -105,7 +105,7 @@ export default {
         },
         title: {
             type: String,
-            required: true,
+            default: '',
         },
         subtitle: {
             type: String,

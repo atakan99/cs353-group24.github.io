@@ -1,183 +1,161 @@
 <template>
-  <v-main class="pa-16">
-        <PaginationTable :items="items" :headers="headers" :tableInfo="tableInfo" :buttonHeader="buttonHeader">
-          <template #buttons="{item}">
-            <v-row>
-             <v-col class="d-flex justify-start mr-n2">
-                <v-btn @click.stop="handleDialog1(item)" large class="rounded-pill font-weight-bold" outlined color="#5080DE">Dialog 1</v-btn>
-            </v-col>
-            <v-col class="d-flex justify-start ml-n16">
-                <v-btn @click.stop="handleDialog2(item)" large class="rounded-pill font-weight-bold" outlined color="#5080DE">Dialog 2</v-btn>
-            </v-col>
-            </v-row>
-          </template>
-        </PaginationTable>
-        <Dialog :tableData="group" :item="item" :itemHeader="headers" :dialog="dialog" :dialogMode="'cols'" :title="'Symptoms'" @close="dialog=false">
-            <template #tableActions>
-                <v-btn class="rounded-pill font-weight-bold" outlined color="#5080DE">Dummy</v-btn>
-            </template>
-        </Dialog>
-        <Dialog :tableData="group" :dialog="dialog2" :title="'Component: Urea'" :subtitle="'Expected Interval: 16.6- 48.5'" @close="dialog2=false">
-          <template #tableActions class="datatablecolor">
-            <v-btn class="rounded-pill font-weight-bold" outlined color="#5080DE">Dummy</v-btn>
-          </template>
-        </Dialog>
-  </v-main>
+    <v-app>
+        <AppointmentDetails :appointment="appointment" :tableInfo="tableInfo" :lists="lists" :model="dialog"
+            @removeSymptom="removeSymptom($event)"
+            @symptomAdd="symptomAdd($event)"
+            @removeTest="removeTest($event)"
+            @testAdd="addTest($event)"
+            @removePres="removePres($event)"
+            @addPres="addPres($event)"
+            @validateForm="validateForm"
+            @close="dialog=false"
+        >
+        </AppointmentDetails>   
+    </v-app>
 </template>
 
 <script>
-import PaginationTable from "@/components/PaginationTable";
-import Dialog from "@/components/Dialog";
+import AppointmentDetails from "@/components/AppointmentDetails"
 export default {
-    data() {
-        return{
-            group: {
-                items:'',
-                headers:'',
-                tableInfo:'',
-                buttonHeader: ''
-            },
-            item: {},
-            item2: {},
-            dialog: false,
-            dialog2: false,
-            buttonHeader: 'actions',
-            headers: [
-            {
-                text: 'Dessert (100g serving)',
-                align: 'start',
-                sortable: false,
-                // filterable: false,
-                value: 'name',
-                class: 'datatablefontcolor--text'
-            },
-            { text: 'Calories', value: 'calories', class: 'datatablefontcolor--text'},
-            { text: 'Fat (g)', value: 'fat', class: 'datatablefontcolor--text'},
-            { text: 'Carbs (g)', value: 'carbs', class: 'datatablefontcolor--text'},
-            { text: 'Protein (g)', value: 'protein', class: 'datatablefontcolor--text'},
-            { text: 'Iron (%)', value: 'iron', class: 'datatablefontcolor--text'},
-            { text: 'Actions', value: 'actions', sortable: false, class: 'datatablefontcolor--text'},
+    data: () => ({
+        dialog:false,
+        tableInfo: {
+            symptomItems: [
+                {
+                    name: 'Weird Ass Disease',
+                    details: 'Patient got a boner and took a massive shit of equal size. Patient then started spinning in circles until he flew off into space like a helicopter. I wanna quit my job.'
+                },
             ],
-            items: [
-            {
-                name: 'Frozen Yogurt',
-                calories: 159,
-                fat: 6.0,
-                carbs: 24,
-                protein: 4.0,
-                iron: '1%',
-            },
-            {
-                name: 'Ice cream sandwich',
-                calories: 237,
-                fat: 9.0,
-                carbs: 37,
-                protein: 4.3,
-                iron: '1%',
-            },
-            {
-                name: 'Eclair',
-                calories: 262,
-                fat: 16.0,
-                carbs: 23,
-                protein: 6.0,
-                iron: '7%',
-            },
-            {
-                name: 'Cupcake',
-                calories: 305,
-                fat: 3.7,
-                carbs: 67,
-                protein: 4.3,
-                iron: '8%',
-            },
-            {
-                name: 'Gingerbread',
-                calories: 356,
-                fat: 16.0,
-                carbs: 49,
-                protein: 3.9,
-                iron: '16%',
-            },
-            {
-                name: 'Jelly bean',
-                calories: 375,
-                fat: 0.0,
-                carbs: 94,
-                protein: 0.0,
-                iron: '0%',
-            },
-            {
-                name: 'Lollipop',
-                calories: 392,
-                fat: 0.2,
-                carbs: 98,
-                protein: 0,
-                iron: '2%',
-            },
-            {
-                name: 'Honeycomb',
-                calories: 408,
-                fat: 3.2,
-                carbs: 87,
-                protein: 6.5,
-                iron: '45%',
-            },
-            {
-                name: 'Donut',
-                calories: 452,
-                fat: 25.0,
-                carbs: 51,
-                protein: 4.9,
-                iron: '22%',
-            },
-            {
-                name: 'KitKat',
-                calories: 518,
-                fat: 26.0,
-                carbs: 65,
-                protein: 7,
-                iron: '6%',
-            },
+            presItems: [],
+            testItems: [],
+        },
+        lists: {
+            symptomsList: [
+                {
+                    name: 'Fever', 
+                    details: 'Body temp is higher than normal'
+                }, 
+                {
+                    name: 'Cold',
+                    details: 'Patient has the sniffles'
+                }
             ],
-            tableInfo: {
-                tableTitle: 'My Paginator',
-                itemsKey: 'name',
-                itemsPerPage: 6,
-            },
-            // color: [{ //can be used to pass colors to coloumns based on computations
-            //     name: 'calories',
-            //     color: ''
-            // },]
-        };
-    },
+            presList: [
+                {
+                    name: 'Paracetamol',
+                    man: 'Big Pharma'
+                },
+                {
+                    name: 'Kalpol',
+                    man: 'Small Pharma'
+                },
+                {
+                    name: 'Wilgesic',
+                    man: 'Medium Pharma'
+                },
+            ],
+            testsList: ['Blood Test', 'X-Ray', 'Ultrasound', 'MRI'],
+            compList: [],
+            labsList: ['Sunny', 'Mohi', 'Atakan', 'Arnissa'], 
+        },
+        appointment: {
+            id: 10,
+            pid: 435,
+            name: 'Mohi The Sicko',
+            date: '',
+            age: 43,
+        },
+    }),
     components:{
-        PaginationTable, Dialog
+        AppointmentDetails
     },
-    methods: {
-        console: function(value) {
-            console.log(value);
+    created(){
+        this.appointment.date = this.toIsoString(new Date()).substring(0, 10)
+    },
+    methods:{
+        validateForm({pres, qty, usage}){
+            let index = this.tableInfo.presItems.findIndex(x => x.name === pres.name)
+            if(index === -1)
+            {
+                this.tableInfo.presItems.push({
+                name: pres.name,
+                man: pres.man,
+                date: this.toIsoString(new Date()).substring(0, 10),
+                qty: qty,
+                usg: usage,
+            })
+            const parsedArray = JSON.stringify(this.tableInfo.presItems);
+            localStorage.setItem('presItems', parsedArray);
+            }
         },
-        // getColor: function(value){
-        //     if (value > 400) this.color.color = 'red'
-        //     else if (value > 200) this.color.color = 'orange'
-        //     else this.color.color = 'green'
-        // }
-        handleDialog1: function(item){
-            // console.log(this.group);
-            this.item = item;
-            this.dialog = true;
+        removePres(item){
+            let index = this.tableInfo.presItems.findIndex(x => x.name === item.name)
+            this.tableInfo.presItems.splice(index, 1)
+            const parsedArray = JSON.stringify(this.tableInfo.presItems);
+            localStorage.setItem('presItems', parsedArray);
         },
-        handleDialog2: function(item){
-            this.item2 = item;
-            this.dialog2 = true;
+        removeSymptom(item){
+            let index = this.tableInfo.symptomItems.findIndex(x => x.name === item.name)
+            this.tableInfo.symptomItems.splice(index, 1)
+            const parsedArray = JSON.stringify(this.tableInfo.symptomItems);
+            localStorage.setItem('symptomItems', parsedArray);
+        },
+        removeTest(item){
+            let index = this.tableInfo.testItems.findIndex(x => x.name === item.name)
+            this.tableInfo.testItems.splice(index, 1)
+            const parsedArray = JSON.stringify(this.tableInfo.testItems);
+            localStorage.setItem('testItems', parsedArray);
+        },
+        addTest(item) {
+            let temp = item.filter(x => (!this.tableInfo.testItems.some(y => y.name === x)))
+            let temp2 = temp.map(x => ({name: x, date: this.toIsoString(new Date()).substring(0, 10), lab: this.lists.labsList[this.rnd(0, this.lists.labsList.length - 1)], status: 'Assigned'}))
+            temp2.forEach(x => this.tableInfo.testItems.push(x))
+            const parsedArray = JSON.stringify(this.tableInfo.testItems);
+            localStorage.setItem('testItems', parsedArray);
+        },
+        symptomAdd(item){
+            let temp = item.filter(x => (!this.tableInfo.symptomItems.some(y => y.name === x.name)))
+            temp.forEach(x => this.tableInfo.symptomItems.push(x))
+            const parsedArray = JSON.stringify(this.tableInfo.symptomItems);
+            localStorage.setItem('symptomItems', parsedArray);
+            
+        },
+        getData(){
+            if (localStorage.getItem('symptomItems')) {
+                try {
+                    this.tableInfo.symptomItems = JSON.parse(localStorage.getItem('symptomItems'));
+                    // console.log(this.events)
+                } catch(e) {
+                    localStorage.removeItem('symptomItems');
+                }
+            }
+            if (localStorage.getItem('testItems')) {
+                try {
+                    this.tableInfo.testItems = JSON.parse(localStorage.getItem('testItems'));
+                    // console.log(this.events)
+                } catch(e) {
+                    localStorage.removeItem('testItems');
+                }
+            }
+            if (localStorage.getItem('presItems')) {
+                try {
+                    this.tableInfo.presItems = JSON.parse(localStorage.getItem('presItems'));
+                    // console.log(this.events)
+                } catch(e) {
+                    localStorage.removeItem('presItems');
+                }
+            }
+        },
+        rnd (a, b) {
+            return Math.floor((b - a + 1) * Math.random()) + a
         },
     },
-    created: function() {
-        this.group.items = this.items
-        this.group.headers = this.headers
-        this.group.tableInfo = this.tableInfo
-        this.group.buttonHeader = this.buttonHeader
-    }
+    mounted () {
+      this.getData()
+    },
 }
 </script>
+
+<style>
+
+</style>
