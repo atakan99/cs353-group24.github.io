@@ -45,7 +45,7 @@ client.connect();
 //-------------------------------------------- ROUTES-------------------------------------------------//
 
 // home router
-
+/*
 app.get('/', function(req, res){
     let q = `SELECT * FROM person;`
     client.query( q, (err, result) =>{
@@ -67,7 +67,7 @@ app.get('/', function(req, res){
         }
     })
 });
-
+*/
 //add triggers to database
 
 /*
